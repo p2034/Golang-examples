@@ -82,6 +82,21 @@ func example_append_writing() {
 	}
 }
 
+//	like it was from user request
+func example_base64() {
+	f, err := os.OpenFile("home.jpeg", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+		time.Sleep(100 * time.Millisecond)
+	}
+}
+
 func main() {
-	example_append_writing()
+	example_base64()
 }
