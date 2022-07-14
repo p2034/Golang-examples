@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"time"
 )
@@ -82,21 +83,25 @@ func example_append_writing() {
 	}
 }
 
-//	like it was from user request
-func example_base64() {
-	f, err := os.OpenFile("home.jpeg", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+func renderFile(w http.ResponseWriter, filename string) {
+	fmt.Println("Read request: " + filename)
+	file, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
-		time.Sleep(100 * time.Millisecond)
+		fmt.Println("Cann't open file: " + filename)
+	} else {
+		w.Write(file)
 	}
 }
 
+//	like it was from user request
+func example_image() {
+	http.HandleFunc("/image", func(w http.ResponseWriter, r *http.Request) {
+		renderFile(w, "./home.jpeg")
+	})
+
+	http.ListenAndServe(":8090", nil)
+}
+
 func main() {
-	example_base64()
+	example_image()
 }
